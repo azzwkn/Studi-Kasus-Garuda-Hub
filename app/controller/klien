@@ -15,10 +15,6 @@ class Klien
         }
     }
 
-    // =====================================
-    // 1. PASANG PROYEK
-    // =====================================
-
     public function pasangProyek()
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -49,10 +45,6 @@ class Klien
         return "Menampilkan form pasang proyek.";
     }
 
-
-    // =====================================
-    // 2. VALIDASI PROYEK
-    // =====================================
 
     private function validasiProyek($data)
     {
@@ -98,10 +90,6 @@ class Klien
     }
 
 
-    // =====================================
-    // 3. DASBOR KLIEN
-    // =====================================
-
     public function dashboard()
     {
         $id = $_SESSION['user_id'];
@@ -120,10 +108,6 @@ class Klien
     }
 
 
-    // =====================================
-    // 4. PROYEK SAYA
-    // =====================================
-
     public function proyekSaya()
     {
         $sql = "SELECT p.*,
@@ -140,11 +124,6 @@ class Klien
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-
-    // =====================================
-    // 5. DETAIL PROYEK
-    // =====================================
-
     public function detailProyek($id)
     {
         $sql = "SELECT * FROM projects
@@ -159,11 +138,6 @@ class Klien
 
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
-
-
-    // =====================================
-    // 6. MELIHAT PENAWARAN
-    // =====================================
 
     public function melihatPenawaran($project_id)
     {
@@ -185,10 +159,6 @@ class Klien
     }
 
 
-    // =====================================
-    // 7. MEMBANDINGKAN PENAWARAN
-    // =====================================
-
     public function membandingkanPenawaran($project_id)
     {
         $penawaran = $this->melihatPenawaran($project_id);
@@ -196,10 +166,6 @@ class Klien
         return $penawaran;
     }
 
-
-    // =====================================
-    // 8. MEMILIH PEMENANG
-    // =====================================
 
     public function memilihPemenang($project_id, $bid_id)
     {
@@ -236,10 +202,6 @@ class Klien
     }
 
 
-    // =====================================
-    // 9. KONFIRMASI PEMENANG
-    // =====================================
-
     public function konfirmasiPemenang($project_id, $bid_id)
     {
         $this->db->beginTransaction();
@@ -274,7 +236,6 @@ class Klien
                 throw new Exception("Penawaran tidak ditemukan.");
             }
 
-            // Tandai penawaran sebagai pemenang
             $sql = "UPDATE bids
                     SET status = 'pemenang'
                     WHERE id = ?";
@@ -282,7 +243,6 @@ class Klien
             $stmt = $this->db->prepare($sql);
             $stmt->execute([$bid_id]);
 
-            // Tutup proyek dan simpan pemenang
             $sql = "UPDATE projects
                     SET status = 'ditutup',
                     winner_bid_id = ?
@@ -308,10 +268,6 @@ class Klien
         }
     }
 
-
-    // =====================================
-    // 10. PENCARIAN PROYEK
-    // =====================================
 
     public function pencarianProyek($keyword)
     {
