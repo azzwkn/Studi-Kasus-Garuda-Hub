@@ -1,0 +1,341 @@
+
+<?php
+
+class Klien
+{
+    private $db;
+
+    public function __construct($db)
+    {
+        $this->db = $db;
+
+        if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'klien') {
+            header("Location: /login");
+            exit;
+        }
+    }
+
+    // =====================================
+    // 1. PASANG PROYEK
+    // =====================================
+
+    public function pasangProyek()
+    {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
+            $data = $this->validasiProyek($_POST);
+
+            $sql = "INSERT INTO projects
+                    (user_id, judul, deskripsi, kategori,
+                    budget_minimum, budget_maksimum,
+                    batas_lelang, status)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, 'terbuka')";
+
+            $stmt = $this->db->prepare($sql);
+
+            $stmt->execute([
+                $_SESSION['user_id'],
+                $data['judul'],
+                $data['deskripsi'],
+                $data['kategori'],
+                $data['budget_minimum'],
+                $data['budget_maksimum'],
+                $data['batas_lelang']
+            ]);
+
+            return "Proyek berhasil dipasang.";
+        }
+
+        return "Menampilkan form pasang proyek.";
+    }
+
+
+    // =====================================
+    // 2. VALIDASI PROYEK
+    // =====================================
+
+    private function validasiProyek($data)
+    {
+        $judul = trim($data['judul'] ?? '');
+        $deskripsi = trim($data['deskripsi'] ?? '');
+        $kategori = trim($data['kategori'] ?? '');
+        $min = $data['budget_minimum'] ?? '';
+        $max = $data['budget_maksimum'] ?? '';
+        $batas = $data['batas_lelang'] ?? '';
+
+        if ($judul === '' || strlen($judul) > 200) {
+            throw new Exception("Judul wajib diisi, maksimal 200 karakter.");
+        }
+
+        if ($deskripsi === '' || strlen($deskripsi) > 5000) {
+            throw new Exception("Deskripsi wajib diisi, maksimal 5000 karakter.");
+        }
+
+        if ($kategori === '' || strlen($kategori) > 50) {
+            throw new Exception("Kategori wajib diisi, maksimal 50 karakter.");
+        }
+
+        if (!ctype_digit((string)$min) || !ctype_digit((string)$max)) {
+            throw new Exception("Budget harus berupa angka bulat.");
+        }
+
+        if ((int)$max < (int)$min) {
+            throw new Exception("Budget maksimum tidak boleh lebih kecil dari minimum.");
+        }
+
+        if (!$batas || $batas < date('Y-m-d')) {
+            throw new Exception("Batas lelang harus hari ini atau setelahnya.");
+        }
+
+        return [
+            'judul' => $judul,
+            'deskripsi' => $deskripsi,
+            'kategori' => $kategori,
+            'budget_minimum' => $min,
+            'budget_maksimum' => $max,
+            'batas_lelang' => $batas
+        ];
+    }
+
+
+    // =====================================
+    // 3. DASBOR KLIEN
+    // =====================================
+
+    public function dashboard()
+    {
+        $id = $_SESSION['user_id'];
+
+        $sql = "SELECT
+                COUNT(*) AS total_proyek,
+                SUM(status = 'terbuka') AS proyek_terbuka,
+                SUM(status = 'ditutup') AS proyek_ditutup
+                FROM projects
+                WHERE user_id = ?";
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([$id]);
+
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+
+    // =====================================
+    // 4. PROYEK SAYA
+    // =====================================
+
+    public function proyekSaya()
+    {
+        $sql = "SELECT p.*,
+                COUNT(b.id) AS jumlah_penawaran
+                FROM projects p
+                LEFT JOIN bids b ON p.id = b.project_id
+                WHERE p.user_id = ?
+                GROUP BY p.id
+                ORDER BY p.id DESC";
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([$_SESSION['user_id']]);
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+
+    // =====================================
+    // 5. DETAIL PROYEK
+    // =====================================
+
+    public function detailProyek($id)
+    {
+        $sql = "SELECT * FROM projects
+                WHERE id = ? AND user_id = ?";
+
+        $stmt = $this->db->prepare($sql);
+
+        $stmt->execute([
+            $id,
+            $_SESSION['user_id']
+        ]);
+
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+
+    // =====================================
+    // 6. MELIHAT PENAWARAN
+    // =====================================
+
+    public function melihatPenawaran($project_id)
+    {
+        $sql = "SELECT b.*, u.nama AS nama_developer
+                FROM bids b
+                JOIN users u ON b.developer_id = u.id
+                JOIN projects p ON b.project_id = p.id
+                WHERE p.id = ? AND p.user_id = ?
+                ORDER BY b.harga ASC";
+
+        $stmt = $this->db->prepare($sql);
+
+        $stmt->execute([
+            $project_id,
+            $_SESSION['user_id']
+        ]);
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+
+    // =====================================
+    // 7. MEMBANDINGKAN PENAWARAN
+    // =====================================
+
+    public function membandingkanPenawaran($project_id)
+    {
+        $penawaran = $this->melihatPenawaran($project_id);
+
+        return $penawaran;
+    }
+
+
+    // =====================================
+    // 8. MEMILIH PEMENANG
+    // =====================================
+
+    public function memilihPemenang($project_id, $bid_id)
+    {
+        $sql = "SELECT * FROM projects
+                WHERE id = ? AND user_id = ?
+                AND status = 'terbuka'";
+
+        $stmt = $this->db->prepare($sql);
+
+        $stmt->execute([
+            $project_id,
+            $_SESSION['user_id']
+        ]);
+
+        $proyek = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$proyek) {
+            throw new Exception("Proyek tidak ditemukan atau sudah ditutup.");
+        }
+
+        $sql = "SELECT * FROM bids
+                WHERE id = ? AND project_id = ?";
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([$bid_id, $project_id]);
+
+        $penawaran = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$penawaran) {
+            throw new Exception("Penawaran tidak ditemukan.");
+        }
+
+        return $penawaran;
+    }
+
+
+    // =====================================
+    // 9. KONFIRMASI PEMENANG
+    // =====================================
+
+    public function konfirmasiPemenang($project_id, $bid_id)
+    {
+        $this->db->beginTransaction();
+
+        try {
+
+            $sql = "SELECT * FROM projects
+                    WHERE id = ? AND user_id = ?
+                    AND status = 'terbuka'
+                    FOR UPDATE";
+
+            $stmt = $this->db->prepare($sql);
+
+            $stmt->execute([
+                $project_id,
+                $_SESSION['user_id']
+            ]);
+
+            $proyek = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if (!$proyek) {
+                throw new Exception("Proyek sudah ditutup atau tidak ditemukan.");
+            }
+
+            $sql = "SELECT * FROM bids
+                    WHERE id = ? AND project_id = ?";
+
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([$bid_id, $project_id]);
+
+            if (!$stmt->fetch(PDO::FETCH_ASSOC)) {
+                throw new Exception("Penawaran tidak ditemukan.");
+            }
+
+            // Tandai penawaran sebagai pemenang
+            $sql = "UPDATE bids
+                    SET status = 'pemenang'
+                    WHERE id = ?";
+
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([$bid_id]);
+
+            // Tutup proyek dan simpan pemenang
+            $sql = "UPDATE projects
+                    SET status = 'ditutup',
+                    winner_bid_id = ?
+                    WHERE id = ? AND user_id = ?";
+
+            $stmt = $this->db->prepare($sql);
+
+            $stmt->execute([
+                $bid_id,
+                $project_id,
+                $_SESSION['user_id']
+            ]);
+
+            $this->db->commit();
+
+            return "Pemenang berhasil dipilih.";
+
+        } catch (Exception $e) {
+
+            $this->db->rollBack();
+
+            throw $e;
+        }
+    }
+
+
+    // =====================================
+    // 10. PENCARIAN PROYEK
+    // =====================================
+
+    public function pencarianProyek($keyword)
+    {
+        $keyword = "%" . $keyword . "%";
+
+        $sql = "SELECT * FROM projects
+                WHERE status = 'terbuka'
+                AND user_id != ?
+                AND (
+                    judul LIKE ?
+                    OR kategori LIKE ?
+                    OR deskripsi LIKE ?
+                )
+                ORDER BY id DESC";
+
+        $stmt = $this->db->prepare($sql);
+
+        $stmt->execute([
+            $_SESSION['user_id'],
+            $keyword,
+            $keyword,
+            $keyword
+        ]);
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+}
