@@ -9,7 +9,7 @@
   <title>Masuk ke Garuda Hub</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap">
-  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="asset/css/regis n login.css">
 </head>
 <body>
 <div class="auth">
