@@ -240,24 +240,13 @@ function auth_home(array $u): never {
     go($u['role'] === 'admin' ? '?page=admin' : '?page=dashboard');
 }
 function page_register(): void {
-    if ($u = current_user()) auth_home($u);
-    $nama = ''; $email = ''; $role = 'klien';
-    if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
-        $nama = (string)($_POST['nama'] ?? '');
-        $email = (string)($_POST['email'] ?? '');
-        $role = (string)($_POST['role'] ?? '');
-        $err = auth_register($nama, $email, (string)($_POST['password'] ?? ''), $role);
+    if ($u = current_user()) auth_home($u);$nama = ''; $email = '';$role = 'klien';
+    if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {$nama = (string)($_POST['nama'] ?? '');$email = (string)($_POST['email'] ?? '');$role = (string)($_POST['role'] ?? '');$err = auth_register($nama,$email, (string)($_POST['password'] ?? ''),$role);
         if ($err === '') { flash('Pendaftaran berhasil. Silakan masuk.'); go('?page=login'); }
         flash($err, 'err');
     }
-    $opt = '';
-    foreach (SELF_ROLES as $r) $opt .= '<option value="' . e($r) . '"' . ($r === $role ? ' selected' : '') . '>' . e(ucfirst($r)) . '</option>';
-    render('Daftar', '<div class="card"><h1>Daftar</h1><form method="post" action="?page=register">' . csrf_field()
-        . '<label>Nama</label><input name="nama" maxlength="100" required value="' . e($nama) . '">'
-        . '<label>Email</label><input name="email" type="email" maxlength="100" required value="' . e($email) . '">'
-        . '<label>Password (min. ' . PW_MIN . ' karakter)</label><input name="password" type="password" minlength="' . PW_MIN . '" maxlength="' . PW_MAX . '" required autocomplete="new-password">'
-        . '<label>Peran</label><select name="role">' . $opt . '</select>'
-        . '<p><button type="submit">Daftar</button></p></form></div>');
+
+    require __DIR__ . '/view/regis.php';
 }
 function page_login(): void {
     if ($u = current_user()) auth_home($u);
@@ -268,10 +257,8 @@ function page_login(): void {
         if ($err === '') { flash('Selamat datang kembali.'); $u = current_user(); if ($u) auth_home($u); go('?page=home'); }
         flash($err, 'err');
     }
-    render('Masuk', '<div class="card"><h1>Masuk</h1><form method="post" action="?page=login">' . csrf_field()
-        . '<label>Email</label><input name="email" type="email" maxlength="100" required value="' . e($email) . '">'
-        . '<label>Password</label><input name="password" type="password" required autocomplete="current-password">'
-        . '<p><button type="submit">Masuk</button></p></form></div>');
+    
+    require __DIR__ . '/view/login.php';
 }
 function page_logout(): void {
     auth_logout();

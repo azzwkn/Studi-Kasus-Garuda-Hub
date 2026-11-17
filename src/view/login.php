@@ -1,6 +1,3 @@
-@section('title', 'LOGIN')
-
-@section('content')
 <!doctype html>
 <html lang="id">
 <head>
@@ -9,7 +6,7 @@
   <title>Masuk ke Garuda Hub</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap">
-  <link rel="stylesheet" href="asset/css/regis n login.css">
+  <link rel="stylesheet" href="asset/css/regis%20n%20login.css">
 </head>
 <body>
 <div class="auth">
@@ -61,10 +58,18 @@
         <p class="auth-card__sub">Gunakan email atau nomor ponsel yang terdaftar.</p>
       </div>
 
-      <form class="form" action="index.html">
+      <?php if (!empty($err)): ?>
+        <div style="background:#fee2e2; color:#991b1b; padding:10px 14px; border-radius:8px; margin-bottom:14px; font-size:14px;">
+          <?= e($err) ?>
+        </div>
+      <?php endif; ?>
+
+      <form class="form" method="post" action="?page=login">
+        <?= csrf_field() ?>
+
         <div class="field">
-          <label class="field__label" for="id">Email atau nomor ponsel</label>
-          <input class="input" id="id" name="id" type="text" autocomplete="username" placeholder="nama@email.com" required>
+          <label class="field__label" for="id">Email</label>
+          <input class="input" id="id" name="email" type="email" maxlength="100" autocomplete="username" placeholder="nama@email.com" value="<?= e($email ?? '') ?>" required>
         </div>
 
         <div class="field">
@@ -90,11 +95,11 @@
         Masuk dengan kode OTP
       </a>
 
-      <p class="auth-card__foot">Belum punya akun? <a class="link-red" href="register.html">Daftar sekarang</a></p>
+      <p class="auth-card__foot">Belum punya akun? <a class="link-red" href="?page=register">Daftar sekarang</a></p>
     </div>
   </main>
 </div>
 
-<script src="js/app.js"></script>
+<script src="asset/js/app.js"></script>
 </body>
 </html>
