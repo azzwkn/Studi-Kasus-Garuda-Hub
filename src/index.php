@@ -23,6 +23,7 @@ const ROUTES = [
     'pick'      => ['page_pick', ['POST']],
     'dashboard' => ['page_dashboard', ['GET']],
     'admin'     => ['page_admin', ['GET', 'POST']],
+    'dashboardklien'     => ['page_dashboardklie', ['GET', 'POST']],
 ];
 
 function e(mixed $v): string { return htmlspecialchars((string)$v, ENT_QUOTES, 'UTF-8'); }
