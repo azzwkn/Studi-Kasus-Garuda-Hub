@@ -472,14 +472,9 @@ function developer_bids(int $uid): array {
 function page_dashboard(): void {
     $u = need_role(...SELF_ROLES);
     if ($u['role'] === 'klien') {
-        $rows = client_projects($u['id']);
-        $h = '<div class="card"><h1>Proyek Saya</h1><p><a href="?page=post">Pasang proyek baru</a></p></div>';
-        if (!$rows) $h .= '<div class="card"><p>Anda belum memasang proyek.</p></div>';
-        foreach ($rows as $p) {
-            $h .= '<div class="card"><h2><a href="?page=project&amp;id=' . (int)$p['id'] . '">' . e($p['judul']) . '</a> ' . status_badge((string)$p['status']) . '</h2>'
-                . '<p class="muted">Budget: ' . rp($p['budget_min']) . ' - ' . rp($p['budget_max'])
-                . ' | Batas: ' . e($p['batas_lelang']) . ' | ' . (int)$p['jml'] . ' penawaran</p></div>';
-        }
+        $proyek = client_projects($u['id']);
+        require __DIR__ . '/view/klien/dashboard.php';
+        return;
     } else {
         $rows = developer_bids($u['id']);
         $h = '<div class="card"><h1>Penawaran Saya</h1></div>';

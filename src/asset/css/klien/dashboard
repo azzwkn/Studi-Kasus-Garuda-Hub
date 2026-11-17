@@ -98,3 +98,15 @@ td.angka, th.angka { text-align: center; }
   .konten { padding: 24px 16px 40px; }
   .judul-halaman h1 { font-size: 1.7rem; }
 }
+
+/* ---------- Tambahan untuk integrasi index.php ---------- */
+.pesan-galat {
+  background: var(--rose-muda); color: var(--rose);
+  border: 1px solid #f0b9bd; border-radius: 14px;
+  padding: 14px 18px; margin-bottom: 20px; font-weight: 600;
+}
+.keluar {
+  font: inherit; cursor: pointer; padding: 8px 16px; border-radius: 10px;
+  background: transparent; color: #fbeee0; border: 1px solid rgba(255, 255, 255, .5);
+}
+.keluar:hover { background: rgba(255, 255, 255, .12); }
