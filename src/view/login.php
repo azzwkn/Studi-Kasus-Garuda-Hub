@@ -38,12 +38,12 @@
     </div>
 
     <div class="auth__pitch">
-      <h2 class="auth__headline">Selamat datang kembali di rumah belanja Nusantara.</h2>
-      <p class="auth__lead">Masuk untuk melanjutkan belanja, memantau pesanan, atau mengelola toko Anda.</p>
+      <h2 class="auth__headline">Selamat datang kembali di Garuda-Hub.</h2>
+      <p class="auth__lead">Masuk untuk memasang proyek IT, mengajukan penawaran terbaik, atau memantau progres lelang Anda.</p>
       <ul class="perks">
-        <li><span class="bullet" aria-hidden="true"><svg class="icon"><path d="M5 12l5 5 9-10"/></svg></span>Produk dari penjual di seluruh Nusantara</li>
-        <li><span class="bullet" aria-hidden="true"><svg class="icon"><path d="M5 12l5 5 9-10"/></svg></span>Pantau pesanan dan penjualan dalam satu tempat</li>
-        <li><span class="bullet" aria-hidden="true"><svg class="icon"><path d="M5 12l5 5 9-10"/></svg></span>Voucher dan promo kampanye setiap pekan</li>
+        <li><span class="bullet" aria-hidden="true"><svg class="icon"><path d="M5 12l5 5 9-10"/></svg></span>PProyek IT terkurasi dari klien di seluruh Nusantara</li>
+        <li><span class="bullet" aria-hidden="true"><svg class="icon"><path d="M5 12l5 5 9-10"/></svg></span>Kelola lelang, penawaran, dan pemenang dalam satu tempat</li>
+        <li><span class="bullet" aria-hidden="true"><svg class="icon"><path d="M5 12l5 5 9-10"/></svg></span>Proses transparan antara klien dan developer terpercaya</li>
       </ul>
     </div>
 
@@ -75,7 +75,6 @@
         <div class="field">
           <div class="field__row">
             <label class="field__label" for="pw">Kata sandi</label>
-            <a class="link-red" href="#">Lupa kata sandi?</a>
           </div>
           <div class="input-wrap">
             <input class="input" id="pw" name="password" type="password" autocomplete="current-password" placeholder="Masukkan kata sandi" required>
@@ -83,17 +82,9 @@
           </div>
         </div>
 
-        <label class="check"><input type="checkbox" name="remember"> Ingat saya di perangkat ini</label>
 
         <button type="submit" class="btn btn--red btn--block">Masuk</button>
       </form>
-
-      <div class="divider"><span>atau</span></div>
-
-      <a class="btn btn--gold-soft btn--block" href="#">
-        <svg class="icon" aria-hidden="true"><path d="M7 2h10a1 1 0 011 1v18a1 1 0 01-1 1H7a1 1 0 01-1-1V3a1 1 0 011-1z M11 18h2"/></svg>
-        Masuk dengan kode OTP
-      </a>
 
       <p class="auth-card__foot">Belum punya akun? <a class="link-red" href="?page=register">Daftar sekarang</a></p>
     </div>

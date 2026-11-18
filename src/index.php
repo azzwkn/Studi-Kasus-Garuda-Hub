@@ -335,17 +335,9 @@ function page_home(): void {
     $s = $_GET['q'] ?? '';
     $s = is_string($s) ? mb_substr(trim($s), 0, PROJ_CARI_MAX) : '';
     $rows = project_list($s);
-    $h = '<div class="card"><h1>Daftar Proyek</h1><form class="search" method="get"><input type="hidden" name="page" value="home">'
-       . '<input name="q" maxlength="' . PROJ_CARI_MAX . '" placeholder="Cari judul atau kategori..." value="' . e($s) . '"><button>Cari</button></form>'
-       . ($s !== '' ? '<p class="muted">Hasil pencarian untuk: <b>' . e($s) . '</b> (' . count($rows) . ' proyek)</p>' : '') . '</div>';
-    if (!$rows) $h .= '<div class="card"><p>Belum ada proyek yang cocok.</p></div>';
-    foreach ($rows as $p) {
-        $h .= '<div class="card"><h2><a href="?page=project&amp;id=' . (int)$p['id'] . '">' . e($p['judul']) . '</a> ' . status_badge((string)$p['status']) . '</h2>'
-            . '<p class="muted">Kategori: ' . e($p['kategori']) . ' | Klien: ' . e($p['klien']) . ' | Budget: ' . rp($p['budget_min']) . ' - ' . rp($p['budget_max'])
-            . ' | Batas: ' . e($p['batas_lelang']) . ' | ' . (int)$p['jml'] . ' penawaran</p>'
-            . '<p>' . e(mb_strimwidth((string)$p['deskripsi'], 0, 160, '...')) . '</p></div>';
-    }
-    render('Proyek', $h);
+    $u = current_user();
+    $f = flash();
+    require __DIR__ . '/view/home.php';
 }
 function page_project(): void {
     $id = filter_var($_GET['id'] ?? null, FILTER_VALIDATE_INT);
