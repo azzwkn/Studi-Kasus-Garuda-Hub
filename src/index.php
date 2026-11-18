@@ -544,39 +544,69 @@ function page_admin(): void {
         if ($err === '') flash($ok); else flash($err, 'err');
         go('?page=admin');
     }
+
     $users = q('SELECT id, nama, email, role FROM users ORDER BY id');
     $projects = q('SELECT p.id, p.judul, p.status, u.nama AS klien
                    FROM projects p JOIN users u ON u.id = p.client_id ORDER BY p.id DESC');
-    $h = '<div class="card"><h1>Admin</h1></div><div class="card"><h2>Kelola User</h2><table>'
-       . '<tr><th>ID</th><th>Nama</th><th>Email</th><th>Peran</th><th>Aksi</th></tr>';
-    foreach ($users as $r) {
-        $id = (int)$r['id'];
-        $h .= '<tr><td>' . $id . '</td><td>' . e($r['nama']) . '</td><td>' . e($r['email']) . '</td><td>' . e($r['role']) . '</td><td>';
-        if ($id === $u['id']) {
-            $h .= '<span class="muted">(akun Anda)</span>';
-        } else {
-            $h .= '<form class="inline" method="post" action="?page=admin">' . csrf_field()
-                . '<input type="hidden" name="act" value="role"><input type="hidden" name="user_id" value="' . $id . '"><select name="role">';
-            foreach (ROLES as $ro) $h .= '<option value="' . e($ro) . '"' . ($ro === $r['role'] ? ' selected' : '') . '>' . e($ro) . '</option>';
-            $h .= '</select> <button class="sm" type="submit">Ubah</button></form> '
-                . '<form class="inline" method="post" action="?page=admin" onsubmit="return confirm(\'Hapus user beserta proyek dan penawarannya?\')">' . csrf_field()
-                . '<input type="hidden" name="act" value="del_user"><input type="hidden" name="user_id" value="' . $id . '">'
-                . '<button class="sm sec" type="submit">Hapus</button></form>';
-        }
-        $h .= '</td></tr>';
-    }
-    $h .= '</table></div><div class="card"><h2>Kelola Proyek</h2><table>'
-        . '<tr><th>ID</th><th>Judul</th><th>Klien</th><th>Status</th><th>Aksi</th></tr>';
-    foreach ($projects as $p) {
-        $id = (int)$p['id'];
-        $h .= '<tr><td>' . $id . '</td><td><a href="?page=project&amp;id=' . $id . '">' . e($p['judul']) . '</a></td><td>' . e($p['klien'])
-            . '</td><td>' . status_badge((string)$p['status']) . '</td><td>'
-            . '<form class="inline" method="post" action="?page=admin" onsubmit="return confirm(\'Hapus proyek beserta penawarannya?\')">' . csrf_field()
-            . '<input type="hidden" name="act" value="del_project"><input type="hidden" name="project_id" value="' . $id . '">'
-            . '<button class="sm sec" type="submit">Hapus</button></form></td></tr>';
-    }
-    render('Admin', $h . '</table></div>');
+    $f = flash();
+    require __DIR__ . '/view/admin.php';
 }
+
+// function page_admin(): void {
+//     $u = need_role('admin');
+//     if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
+//         $act = $_POST['act'] ?? '';
+//         $uid = post_int('user_id');
+//         if ($act === 'role') {
+//             $role = $_POST['role'] ?? '';
+//             $err = admin_set_role($u['id'], $uid, is_string($role) ? $role : '');
+//             $ok = 'Peran user diubah.';
+//         } elseif ($act === 'del_user') {
+//             $err = admin_delete_user($u['id'], $uid);
+//             $ok = 'User dihapus.';
+//         } elseif ($act === 'del_project') {
+//             $err = admin_delete_project(post_int('project_id'));
+//             $ok = 'Proyek dihapus.';
+//         } else {
+//             $err = 'Aksi tidak dikenal.';
+//             $ok = '';
+//         }
+//         if ($err === '') flash($ok); else flash($err, 'err');
+//         go('?page=admin');
+//     }
+//     $users = q('SELECT id, nama, email, role FROM users ORDER BY id');
+//     $projects = q('SELECT p.id, p.judul, p.status, u.nama AS klien
+//                    FROM projects p JOIN users u ON u.id = p.client_id ORDER BY p.id DESC');
+//     $h = '<div class="card"><h1>Admin</h1></div><div class="card"><h2>Kelola User</h2><table>'
+//        . '<tr><th>ID</th><th>Nama</th><th>Email</th><th>Peran</th><th>Aksi</th></tr>';
+//     foreach ($users as $r) {
+//         $id = (int)$r['id'];
+//         $h .= '<tr><td>' . $id . '</td><td>' . e($r['nama']) . '</td><td>' . e($r['email']) . '</td><td>' . e($r['role']) . '</td><td>';
+//         if ($id === $u['id']) {
+//             $h .= '<span class="muted">(akun Anda)</span>';
+//         } else {
+//             $h .= '<form class="inline" method="post" action="?page=admin">' . csrf_field()
+//                 . '<input type="hidden" name="act" value="role"><input type="hidden" name="user_id" value="' . $id . '"><select name="role">';
+//             foreach (ROLES as $ro) $h .= '<option value="' . e($ro) . '"' . ($ro === $r['role'] ? ' selected' : '') . '>' . e($ro) . '</option>';
+//             $h .= '</select> <button class="sm" type="submit">Ubah</button></form> '
+//                 . '<form class="inline" method="post" action="?page=admin" onsubmit="return confirm(\'Hapus user beserta proyek dan penawarannya?\')">' . csrf_field()
+//                 . '<input type="hidden" name="act" value="del_user"><input type="hidden" name="user_id" value="' . $id . '">'
+//                 . '<button class="sm sec" type="submit">Hapus</button></form>';
+//         }
+//         $h .= '</td></tr>';
+//     }
+//     $h .= '</table></div><div class="card"><h2>Kelola Proyek</h2><table>'
+//         . '<tr><th>ID</th><th>Judul</th><th>Klien</th><th>Status</th><th>Aksi</th></tr>';
+//     foreach ($projects as $p) {
+//         $id = (int)$p['id'];
+//         $h .= '<tr><td>' . $id . '</td><td><a href="?page=project&amp;id=' . $id . '">' . e($p['judul']) . '</a></td><td>' . e($p['klien'])
+//             . '</td><td>' . status_badge((string)$p['status']) . '</td><td>'
+//             . '<form class="inline" method="post" action="?page=admin" onsubmit="return confirm(\'Hapus proyek beserta penawarannya?\')">' . csrf_field()
+//             . '<input type="hidden" name="act" value="del_project"><input type="hidden" name="project_id" value="' . $id . '">'
+//             . '<button class="sm sec" type="submit">Hapus</button></form></td></tr>';
+//     }
+//     render('Admin', $h . '</table></div>');
+// }
 
 // ===== M1: router =====
 $page = (string)($_GET['page'] ?? 'home');
