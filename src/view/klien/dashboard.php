@@ -1,10 +1,4 @@
-<?php
-// src/view/klien/dashboard.php
-// Dipanggil dari page_dashboard() di index.php.
-// Variabel yang tersedia: $u (user login), $proyek (hasil client_projects()).
-// Fungsi e(), rp(), flash(), csrf_field() berasal dari index.php.
-$f = flash();
-?>
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -85,6 +79,6 @@ $f = flash();
     <?php endif; ?>
   </section>
 </main>
-
+</main>
 </body>
 </html>

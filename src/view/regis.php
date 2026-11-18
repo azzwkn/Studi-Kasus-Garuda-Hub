@@ -59,9 +59,7 @@
       </div>
 
       <?php if (!empty($err)): ?>
-        <div style="background:#fee2e2; color:#991b1b; padding:10px 14px; border-radius:8px; margin-bottom:14px; font-size:14px;">
-          <?= e($err) ?>
-        </div>
+        <div class="auth-alert"><?= e($err) ?></div>
       <?php endif; ?>
 
       <div class="segmented segmented--full" role="group" aria-label="Daftar sebagai">
@@ -77,3 +75,38 @@
           <label class="field__label" for="nama">Nama lengkap</label>
           <input class="input" id="nama" name="nama" type="text" maxlength="100" autocomplete="name" placeholder="Nama sesuai identitas" value="<?= e($nama ?? '') ?>" required>
         </div>
+
+        <div class="field">
+          <label class="field__label" for="email">Email</label>
+          <input class="input" id="email" name="email" type="email" maxlength="100" autocomplete="email" placeholder="nama@email.com" value="<?= e($email ?? '') ?>" required>
+        </div>
+
+        <div class="field">
+          <label class="field__label" for="pw">Kata sandi</label>
+          <div class="input-wrap">
+            <input class="input" id="pw" name="password" type="password" minlength="6" maxlength="72" autocomplete="new-password" placeholder="Minimal 6 karakter" required>
+            <button type="button" class="input-wrap__btn" data-toggle-password="#pw" aria-pressed="false">Tampilkan</button>
+          </div>
+        </div>
+
+        <label class="check"><input type="checkbox" required> Saya menyetujui syarat dan ketentuan penggunaan Garuda Hub</label>
+
+        <button type="submit" class="btn btn--red btn--block">Buat Akun</button>
+      </form>
+
+      <p class="auth-card__foot">Sudah punya akun? <a class="link-red" href="?page=login">Masuk di sini</a></p>
+    </div>
+  </main>
+</div>
+
+<script src="asset/js/app.js"></script>
+<script>
+function pilihPeran(peran, btn) {
+  document.getElementById('role-input').value = peran;
+  document.querySelectorAll('.segmented__btn').forEach(function (el) {
+    el.setAttribute('aria-pressed', el === btn ? 'true' : 'false');
+  });
+}
+</script>
+</body>
+</html>

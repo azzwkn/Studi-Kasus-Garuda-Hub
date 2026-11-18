@@ -38,7 +38,7 @@ Website lelang proyek IT: klien memasang proyek, developer menawar, klien memili
    | --- | --- |
    | `GH_DB_HOST` | `127.0.0.1` |
    | `GH_DB_USER` | `root` |
-   | `GH_DB_PASS` | kosong |
+   | `GH_DB_PASS` | kosong |  
    | `GH_DB_NAME` | `garuda_hub` |
    | `GH_DB_PORT` | `3306` |
 

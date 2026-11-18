@@ -21,9 +21,9 @@ const ROUTES = [
     'post'      => ['page_post', ['GET', 'POST']],
     'bid'       => ['page_bid', ['POST']],
     'pick'      => ['page_pick', ['POST']],
-    'dashboard' => ['page_dashboard', ['GET']],
+    'dashboard' => ['page_dashboardklie', ['GET']],
     'admin'     => ['page_admin', ['GET', 'POST']],
-    'dashboardklien'     => ['page_dashboardklie', ['GET', 'POST']],
+    'dashboardklie' => ['page_dashboardklie', ['GET']],
 ];
 
 function e(mixed $v): string { return htmlspecialchars((string)$v, ENT_QUOTES, 'UTF-8'); }
@@ -250,15 +250,32 @@ function page_register(): void {
     require __DIR__ . '/view/regis.php';
 }
 function page_login(): void {
-    if ($u = current_user()) auth_home($u);
+    if ($u = current_user()) {
+        if ($u['role'] === 'klien') go('?page=dashboardklie');
+        auth_home($u);
+    }
+
     $email = '';
+    $err = '';
+
     if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
         $email = (string)($_POST['email'] ?? '');
         $err = auth_login($email, (string)($_POST['password'] ?? ''));
-        if ($err === '') { flash('Selamat datang kembali.'); $u = current_user(); if ($u) auth_home($u); go('?page=home'); }
+
+        if ($err === '') {
+            flash('Selamat datang kembali.');
+            $u = current_user();
+            if ($u) {
+                if ($u['role'] === 'klien') {
+                    go('?page=dashboardklie');
+                }
+                auth_home($u);
+            }
+            go('?page=home');
+        }
         flash($err, 'err');
     }
-    
+
     require __DIR__ . '/view/login.php';
 }
 function page_logout(): void {
@@ -469,10 +486,11 @@ function developer_bids(int $uid): array {
               FROM bids b JOIN projects p ON p.id = b.project_id JOIN users u ON u.id = p.client_id
               WHERE b.developer_id = ? ORDER BY b.id DESC', 'i', [$uid]);
 }
-function page_dashboard(): void {
+function page_dashboardklie(): void {
     $u = need_role(...SELF_ROLES);
     if ($u['role'] === 'klien') {
         $proyek = client_projects($u['id']);
+        $f = flash(); 
         require __DIR__ . '/view/klien/dashboard.php';
         return;
     } else {

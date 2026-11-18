@@ -411,3 +411,13 @@ input::placeholder { color: #756B5F; opacity: 1; }
   .hero { padding: 22px 20px; }
   .auth__headline { font-size: 32px; }
 }
+
+.auth-alert {
+  background: #fee2e2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
+  padding: 10px 14px;
+  border-radius: 8px;
+  margin-bottom: 14px;
+  font-size: 14px;
+}
