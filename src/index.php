@@ -24,6 +24,7 @@ const ROUTES = [
     'dashboard' => ['page_dashboardklie', ['GET']],
     'admin'     => ['page_admin', ['GET', 'POST']],
     'dashboardklie' => ['page_dashboardklie', ['GET']],
+    'developer' => ['page_developer', ['GET']]
 ];
 
 function e(mixed $v): string { return htmlspecialchars((string)$v, ENT_QUOTES, 'UTF-8'); }
@@ -485,18 +486,11 @@ function page_dashboardklie(): void {
         $f = flash(); 
         require __DIR__ . '/view/klien/dashboard.php';
         return;
-    } else {
-        $rows = developer_bids($u['id']);
-        $h = '<div class="card"><h1>Penawaran Saya</h1></div>';
-        if (!$rows) $h .= '<div class="card"><p>Anda belum mengajukan penawaran.</p></div>';
-        foreach ($rows as $b) {
-            $h .= '<div class="card"><h2><a href="?page=project&amp;id=' . (int)$b['project_id'] . '">' . e($b['judul']) . '</a> ' . status_badge((string)$b['status'])
-                . ((int)$b['is_winner'] === 1 ? ' <span class="badge open">Pemenang</span>' : '') . '</h2>'
-                . '<p class="muted">Klien: ' . e($b['klien']) . ' | Harga: ' . rp($b['harga']) . ' | Durasi: ' . (int)$b['durasi'] . ' hari'
-                . ' | Batas: ' . e($b['batas_lelang']) . '</p></div>';
-        }
     }
-    render('Dasbor', $h);
+
+    $bids = developer_bids($u['id']);
+    $f = flash();
+    require __DIR__ . '/view/developer.php';
 }
 
 // ===== M6: admin =====
@@ -521,6 +515,22 @@ function admin_delete_project(int $pid): string {
     // Penawaran ikut terhapus lewat FK ON DELETE CASCADE
     $n = q('DELETE FROM projects WHERE id = ?', 'i', [$pid]);
     return $n > 0 ? '' : 'Proyek tidak ditemukan.';
+}
+
+function page_developer(): void {
+    $u = need_role('developer');
+    $bids = q(
+        'SELECT b.id, b.harga, b.durasi_hari, b.pemenang, p.id AS project_id, p.judul, p.status, p.batas_lelang, u.nama AS klien
+         FROM bids b
+         JOIN projects p ON p.id = b.project_id
+         JOIN users u ON u.id = p.client_id
+         WHERE b.developer_id = ?
+         ORDER BY b.id DESC',
+        'i',
+        [$u['id']]
+    );
+    $f = flash();
+    require __DIR__ . '/view/developer.php';
 }
 function page_admin(): void {
     $u = need_role('admin');
